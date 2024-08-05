@@ -1,0 +1,7 @@
+workflow.dremio.yaml
+local-openmetadata-stack/docker-volume
+
+# JetBrains IDE
+.idea/
+*.iml
+
