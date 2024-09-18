@@ -48,6 +48,24 @@ WHERE SCHEMA_NAME LIKE '{database_name}.%'
 )
 
 
+DREMIO_GET_TABLES = textwrap.dedent(
+    """
+SELECT TABLE_NAME 
+FROM INFORMATION_SCHEMA.\"TABLES\"
+WHERE TABLE_SCHEMA  = '{schema_name}' 
+AND TABLE_TYPE = 'TABLE'
+    """
+)
+
+DREMIO_GET_VIEWS = textwrap.dedent(
+    """
+SELECT TABLE_NAME 
+FROM INFORMATION_SCHEMA.\"TABLES\"
+WHERE TABLE_SCHEMA  = '{schema_name}' 
+AND TABLE_TYPE = 'VIEW'
+    """
+)
+
 # SqlAlchemy < 2.0 doesn't have a DOUBLE type, but using Float here would be misleading and can be dangerous for the openmetadata users
 class DOUBLE(types.Float):
     __visit_name__ = "DOUBLE"
@@ -200,12 +218,20 @@ class DremioConnector(CommonDbSourceService, MultiDBSource):
     def query_table_names_and_types(
             self, schema_name: str
     ) -> Iterable[TableNameAndType]:
-        return super().query_table_names_and_types(self._add_database_to_schema_name(schema_name))
+        # sqlalchemy-dremio has only implemented get_table_names but also returns Views in this implementation.
+        # Instead of using this implementation we created our own query to return only TABLES and in the method query_view_names_and_types only VIEWS
+        return [
+            TableNameAndType(name=table_name)
+            for table_name in self._execute_database_query(DREMIO_GET_TABLES.format(schema_name=self._add_database_to_schema_name(schema_name))) or []
+        ]
 
     def query_view_names_and_types(
             self, schema_name: str
     ) -> Iterable[TableNameAndType]:
-        return super().query_view_names_and_types(self._add_database_to_schema_name(schema_name))
+        return [
+            TableNameAndType(name=table_name, type_=TableType.View)
+            for table_name in self._execute_database_query(DREMIO_GET_VIEWS.format(schema_name=self._add_database_to_schema_name(schema_name))) or []
+        ]
 
     def set_inspector(self, database_name: str) -> None:
         # Mainly a copy of the parent class with the small change
