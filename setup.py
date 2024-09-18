@@ -8,7 +8,7 @@ with open(path.join(here, 'requirements.txt'), encoding='utf-8') as f:
 
 setup(
     name="custom-dremio-connector",
-    version="0.1.0",
+    version="0.2.0",
     author="TIKI",
     python_requires=">=3.9",
     install_requires=requirements,
