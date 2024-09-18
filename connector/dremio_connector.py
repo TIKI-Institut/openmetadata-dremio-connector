@@ -5,7 +5,7 @@ from typing import Optional, Iterable, Dict, Any, Tuple, List
 
 from metadata.generated.schema.api.lineage.addLineage import AddLineageRequest
 from metadata.generated.schema.entity.data.database import Database
-from metadata.generated.schema.entity.data.table import Column, TableConstraint
+from metadata.generated.schema.entity.data.table import Column, TableConstraint, TableType
 from metadata.generated.schema.entity.services.connections.database.customDatabaseConnection import \
     CustomDatabaseConnection
 from metadata.generated.schema.metadataIngestion.workflow import (
@@ -192,7 +192,7 @@ class DremioConnector(CommonDbSourceService, MultiDBSource):
             self._add_database_to_schema_name(schema_name), table_name, db_name, inspector)
 
     def get_schema_definition(
-            self, table_type: str, table_name: str, schema_name: str, inspector: Inspector
+            self, table_type: TableType, table_name: str, schema_name: str, inspector: Inspector
     ) -> Optional[str]:
         return super().get_schema_definition(
             table_type, table_name, self._add_database_to_schema_name(schema_name), inspector)
