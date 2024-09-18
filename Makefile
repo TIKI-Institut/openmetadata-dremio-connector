@@ -1,4 +1,4 @@
-OM_INGESTION_IMAGE_VERSION := 1.4.7
+OM_INGESTION_IMAGE_VERSION := 1.5.4
 
 .PHONY: help
 help:  ## shows the Makefile targets with information

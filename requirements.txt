@@ -1,3 +1,3 @@
-openmetadata-ingestion>=1.4.4,<1.5
+openmetadata-ingestion>=1.5.1,<1.6
 sqlalchemy-dremio~=3.0.4
 pandas~=2.2.0

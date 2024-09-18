@@ -96,8 +96,8 @@ class DremioConnector(CommonDbSourceService, MultiDBSource):
     @classmethod
     def create(cls, config_dict: dict, metadata: OpenMetadata,
                pipeline_name: Optional[str] = None) -> "DremioConnector":
-        config: WorkflowSource = WorkflowSource.parse_obj(config_dict)
-        connection: CustomDatabaseConnection = config.serviceConnection.__root__.config
+        config: WorkflowSource = WorkflowSource.model_validate(config_dict)
+        connection: CustomDatabaseConnection = config.serviceConnection.root.config
         if not isinstance(connection, CustomDatabaseConnection):
             raise InvalidSourceException(
                 f"Expected CustomDatabaseConnection, but got {connection}"
@@ -234,7 +234,7 @@ class DremioConnector(CommonDbSourceService, MultiDBSource):
 
 def get_connection_url(connection: CustomDatabaseConnection) -> str:
     def _get_option_or_else(option_name: str, *, default: Any = None, expected: bool = False):
-        value = connection.connectionOptions.__root__.get(option_name)
+        value = connection.connectionOptions.root.get(option_name)
         if not value:
             if expected:
                 raise InvalidDremioConnectorException(f"Missing connection option: {option_name}")
@@ -253,7 +253,7 @@ def get_connection_url(connection: CustomDatabaseConnection) -> str:
                                                            expected=False)
 
     not_handled_options = (
-            set(connection.connectionOptions.__root__.keys()) -
+            set(connection.connectionOptions.root.keys()) -
             {"username", "password", "hostPort", "UseEncryption", "disableCertificateVerification"}
     )
 
